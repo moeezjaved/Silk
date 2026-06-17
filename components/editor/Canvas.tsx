@@ -102,7 +102,7 @@ export function Canvas() {
   }
 
   return (
-    <div ref={wrapRef} className="flex-1 flex items-center justify-center overflow-hidden bg-[#0b0b0f]">
+    <div ref={wrapRef} className="flex-1 flex items-center justify-center overflow-hidden bg-[#ececed]">
       <div
         onPointerDown={() => select(null)}
         style={{

@@ -18,6 +18,13 @@ const ACTIONS = [
   { key: 'explore', icon: '◎', title: 'Just exploring', desc: "Take a look around and see what's possible" },
 ]
 
+const CATEGORIES = [
+  'Apparel', 'Beauty', 'Before and After', 'Comparisons', 'Customer Reviews',
+  'Feature Callouts', 'Food and Beverage', 'Health & Wellness', 'Home', 'Pets',
+  'Press', 'Product Showcase', 'Sale', 'Slideshows', 'Software / Apps', 'Travel',
+  'UGC', 'Us vs Them', 'Other',
+]
+
 function Select({ label, value, onChange, options, placeholder }: {
   label: string; value: string; onChange: (v: string) => void; options: string[]; placeholder: string
 }) {
@@ -50,7 +57,17 @@ function Onboarding() {
   const [team, setTeam] = useState('')
   const [source, setSource] = useState('')
   const [action, setAction] = useState('')
+  const [cats, setCats] = useState<string[]>([])
   const [busy, setBusy] = useState(false)
+
+  const toggleCat = (c: string) =>
+    setCats((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]))
+
+  // step 2 "Let's go": template-pickers get the category screen first
+  function advanceFromActions() {
+    if (action === 'template') setStep(3)
+    else finish()
+  }
 
   async function finish() {
     setBusy(true)
@@ -63,9 +80,13 @@ function Onboarding() {
         team_size: team,
         heard_about: source,
         first_action: action,
+        template_categories: cats,
       },
     })
-    const dest = action === 'template' ? '/editor' : next
+    const dest =
+      action === 'template'
+        ? `/editor${cats.length ? `?cat=${encodeURIComponent(cats.join(','))}` : ''}`
+        : next
     router.push(dest)
     router.refresh()
   }
@@ -118,9 +139,42 @@ function Onboarding() {
             </div>
 
             <button
-              onClick={finish}
+              onClick={advanceFromActions}
               disabled={!action || busy}
               className="mt-10 bg-[#15120e] text-white font-semibold rounded-xl px-8 py-3.5 disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              {busy ? 'Setting up…' : "Let's go"}
+            </button>
+          </>
+        )}
+
+        {step === 3 && (
+          <>
+            <button onClick={() => setStep(2)} className="text-[#6b6358] hover:text-black mb-8 text-sm">← Back</button>
+            <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-3">Start from a video template</h1>
+            <p className="text-lg text-[#6b6358] mb-10">What kind of templates are you looking for? Select all that apply.</p>
+
+            <div className="flex flex-wrap gap-3 max-w-4xl">
+              {CATEGORIES.map((c) => {
+                const on = cats.includes(c)
+                return (
+                  <button
+                    key={c}
+                    onClick={() => toggleCat(c)}
+                    className={`rounded-full border px-5 py-2.5 text-sm font-medium transition ${
+                      on ? 'bg-[#15120e] text-white border-[#15120e]' : 'border-black/20 hover:border-black/50'
+                    }`}
+                  >
+                    {c}
+                  </button>
+                )
+              })}
+            </div>
+
+            <button
+              onClick={finish}
+              disabled={!cats.length || busy}
+              className="mt-12 bg-[#15120e] text-white font-semibold rounded-xl px-8 py-3.5 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               {busy ? 'Setting up…' : "Let's go"}
             </button>

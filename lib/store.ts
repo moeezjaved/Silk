@@ -2,7 +2,7 @@
 
 import { create } from 'zustand'
 import { nanoid } from 'nanoid'
-import { Layer, LayerType, SceneDoc, emptyDoc } from './doc'
+import { FORMATS, Layer, LayerType, SceneDoc, emptyDoc } from './doc'
 
 interface EditorState {
   doc: SceneDoc
@@ -17,7 +17,11 @@ interface EditorState {
 
   // document ops
   loadDoc: (doc: SceneDoc) => void
+  rename: (name: string) => void
+  setFormat: (format: keyof typeof FORMATS) => void
+  setDuration: (frames: number) => void
   addLayer: (type: LayerType) => void
+  addLayerFrom: (layer: Layer) => void
   updateLayer: (id: string, patch: Partial<Layer>) => void
   removeLayer: (id: string) => void
   reorder: (id: string, dir: 'up' | 'down') => void
@@ -106,11 +110,22 @@ export const useEditor = create<EditorState>((set, get) => ({
 
   loadDoc: (doc) => set({ doc, selectedId: null, currentFrame: 0, playing: false }),
 
+  rename: (name) => set((s) => ({ doc: { ...s.doc, name } })),
+
+  setFormat: (format) =>
+    set((s) => ({ doc: { ...s.doc, width: FORMATS[format].width, height: FORMATS[format].height } })),
+
+  setDuration: (frames) =>
+    set((s) => ({ doc: { ...s.doc, durationInFrames: Math.max(30, Math.round(frames)) } })),
+
   addLayer: (type) =>
     set((s) => {
       const layer = makeLayer(type, s.doc)
       return { doc: { ...s.doc, layers: [...s.doc.layers, layer] }, selectedId: layer.id }
     }),
+
+  addLayerFrom: (layer) =>
+    set((s) => ({ doc: { ...s.doc, layers: [...s.doc.layers, layer] }, selectedId: layer.id })),
 
   updateLayer: (id, patch) =>
     set((s) => ({
