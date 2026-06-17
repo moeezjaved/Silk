@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Silk — Create better video, faster.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Baloo+2:wght@800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#f3f0e9;
+    --ink:#15120e;
+    --muted:#6b6358;
+    --line:rgba(21,18,14,0.10);
+    --yellow:#ffe14d;
+    --blue:#7db4ff;
+    --navy:#1b1f4d;
+    --pink:#ff5b7f;
+    --orange:#ff8a3d;
+    --teal:#1fb6a6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  a{text-decoration:none;color:inherit}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:15px;line-height:1;padding:13px 26px;border-radius:100px;cursor:pointer;border:none;transition:transform .15s,box-shadow .15s}
+  .btn-dark{background:var(--ink);color:#fff}
+  .btn-dark:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.22)}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(243,240,233,.82);backdrop-filter:blur(14px)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .word{font-weight:900;font-size:22px;letter-spacing:-.02em}
+  .nav-links{display:flex;gap:26px}
+  .nav-links a{font-size:14px;font-weight:600;color:var(--muted)}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-right{display:flex;align-items:center;gap:18px}
+
+  /* HERO CARD */
+  .hero{padding:84px 0 0}
+  .hero-card{position:relative;border-radius:26px;overflow:hidden;background:
+      linear-gradient(#f8f5ee,#f8f5ee);
+    border:1px solid var(--line);min-height:460px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:70px 20px}
+  /* isometric grid */
+  .grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(21,18,14,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(21,18,14,.06) 1px,transparent 1px);background-size:34px 34px;mask-image:radial-gradient(120% 90% at 50% 40%,#000 40%,transparent 80%)}
+  .hero-objs{position:absolute;inset:0;pointer-events:none}
+  .obj{position:absolute;filter:drop-shadow(0 16px 22px rgba(0,0,0,.16))}
+  .o-spring{left:5%;top:46%;animation:float 7s ease-in-out infinite}
+  .o-sphere{right:9%;top:14%;animation:float 8s ease-in-out infinite .6s}
+  .o-pill{right:6%;top:33%;animation:float 6s ease-in-out infinite 1.2s}
+  @keyframes float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-18px) rotate(5deg)}}
+
+  .phones{display:flex;gap:14px;align-items:flex-end;margin-bottom:34px;position:relative;z-index:3}
+  .phone{width:118px;height:210px;border-radius:18px;overflow:hidden;box-shadow:0 22px 50px rgba(0,0,0,.22);border:5px solid #15120e}
+  .phone.tall{height:240px}
+  .phone .scr{width:100%;height:100%}
+  h1.hero-title{font-size:clamp(34px,5.4vw,60px);font-weight:900;letter-spacing:-.04em;text-align:center;position:relative;z-index:3;margin-bottom:26px}
+  .hero-card .btn{position:relative;z-index:3}
+
+  /* LOGO BAR */
+  .logobar{padding:26px 0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+  .logo-track{display:flex;gap:54px;width:max-content;animation:scroll 28s linear infinite;align-items:center}
+  .logo-track span{font-size:24px;font-weight:900;letter-spacing:-.02em;white-space:nowrap;opacity:.92}
+  @keyframes scroll{to{transform:translateX(-50%)}}
+
+  /* DARK SECTION */
+  .dark{background:#141414;color:#fff;border-radius:0;padding:80px 0 90px;position:relative;overflow:hidden}
+  .dark h2{font-size:clamp(28px,4vw,40px);font-weight:900;text-align:center;letter-spacing:-.03em;max-width:16ch;margin:0 auto 14px}
+  .dark .sub{text-align:center;color:rgba(255,255,255,.55);font-size:16px;max-width:48ch;margin:0 auto 44px}
+  .editor{max-width:900px;margin:0 auto;background:#f4f2ee;border-radius:16px;padding:10px;box-shadow:0 30px 80px rgba(0,0,0,.5);position:relative;z-index:3}
+  .editor-bar{display:flex;gap:6px;padding:8px 10px}
+  .editor-bar i{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .editor-body{display:flex;gap:10px;padding:0 10px 10px}
+  .ed-main{flex:1;background:#e9e6df;border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:10px}
+  .ed-row{background:var(--navy);color:#fff;text-align:center;font-weight:800;font-size:15px;padding:11px;border-radius:7px}
+  .ed-side{width:150px;background:#fff;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px}
+  .ed-side .lbl{font-size:10px;font-weight:700;color:#999}
+  .ed-side .swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+  .ed-side .swatches i{aspect-ratio:1;border-radius:5px}
+  .dk-obj{position:absolute;filter:drop-shadow(0 14px 20px rgba(0,0,0,.4))}
+  .dk1{right:6%;top:24%;animation:float 7s ease-in-out infinite}
+  .dk2{left:4%;bottom:10%;animation:float 8s ease-in-out infinite .8s}
+
+  /* YELLOW SECTION */
+  .yellow{background:var(--yellow);padding:74px 0 90px;text-align:center;overflow:hidden}
+  .yellow h2{font-size:clamp(28px,4vw,42px);font-weight:900;letter-spacing:-.03em;margin-bottom:14px}
+  .yellow p{color:rgba(0,0,0,.6);font-size:16px;max-width:46ch;margin:0 auto 26px}
+  .fan{display:flex;justify-content:center;gap:0;margin-top:54px;padding:0 10px}
+  .fan .tcard{width:150px;height:230px;border-radius:14px;margin:0 -10px;box-shadow:0 18px 40px rgba(0,0,0,.22);border:4px solid #15120e;overflow:hidden;transition:transform .25s}
+  .fan .tcard:hover{transform:translateY(-14px) scale(1.04);z-index:5}
+
+  /* BLOCKS */
+  .blocks{padding:90px 0;text-align:center}
+  .blocks h2,.sec h2{font-size:clamp(28px,4vw,40px);font-weight:900;letter-spacing:-.03em}
+  .blocks .sub{color:var(--muted);font-size:16px;max-width:44ch;margin:14px auto 0}
+  .bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+  .bcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;text-align:left}
+  .bcard .thumb{background:var(--blue);border-radius:11px;aspect-ratio:16/10;margin-bottom:14px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .bcard h3{font-size:15px;font-weight:800}
+  .bcard .timeline{display:flex;gap:4px;margin-top:8px}
+  .bcard .timeline i{height:5px;border-radius:3px;background:#e3ddd2;flex:1}
+  .bcard .timeline i:first-child{flex:.4;background:#bbb}
+
+  /* SPLIT SECTIONS */
+  .sec{padding:70px 0}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
+  .split.right .txt{order:2}
+  .split .lead{color:var(--muted);font-size:17px;line-height:1.6;margin-top:14px;max-width:40ch}
+  .split.right .txt{text-align:right}
+  .split.right .lead{margin-left:auto}
+  .mini-fan{display:flex;justify-content:center;gap:0}
+  .mini-fan .m{width:120px;height:170px;border-radius:12px;margin:0 -8px;box-shadow:0 14px 34px rgba(0,0,0,.18);border:3px solid #15120e;overflow:hidden}
+
+  /* SMART TOOLS */
+  .smart{padding:90px 0}
+  .smart h2{text-align:center;font-size:clamp(28px,4vw,40px);font-weight:900;letter-spacing:-.03em;margin-bottom:48px}
+  .smart-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
+  .tool{border-top:1px solid var(--line);padding:20px 0}
+  .tool h4{font-size:18px;font-weight:800;margin-bottom:6px}
+  .tool p{color:var(--muted);font-size:15px;line-height:1.55}
+  .tunnel{aspect-ratio:1;border-radius:18px;background:#0a0f0a;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .tunnel .gridt{position:absolute;inset:0;background-image:linear-gradient(rgba(31,182,166,.45) 1px,transparent 1px),linear-gradient(90deg,rgba(31,182,166,.45) 1px,transparent 1px);background-size:28px 28px;transform:perspective(400px) rotateX(55deg) scale(1.6);transform-origin:center 70%}
+  .tunnel .face{width:78px;height:104px;border-radius:8px;background:linear-gradient(135deg,#ffce9e,#e8a06a);position:relative;z-index:2;box-shadow:0 0 40px rgba(31,182,166,.5)}
+
+  /* FOOTER CTA */
+  .footcta{padding:70px 0 50px;text-align:center}
+  .balloon{font-family:'Baloo 2',cursive;font-weight:800;font-size:clamp(70px,15vw,168px);line-height:1;letter-spacing:.01em;color:var(--yellow);text-shadow:0 1px 0 #e6b800,0 2px 0 #e6b800,0 6px 0 #c99e00,0 14px 26px rgba(0,0,0,.25);-webkit-text-stroke:3px #15120e}
+  footer{padding:40px 0;border-top:1px solid var(--line)}
+  .foot-grid{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap}
+  .foot-col h4{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:#a39a8c;margin-bottom:12px}
+  .foot-col a{display:block;font-size:14px;color:var(--muted);margin-bottom:9px}
+  .foot-bottom{margin-top:36px;display:flex;justify-content:space-between;font-size:13px;color:#a39a8c;flex-wrap:wrap;gap:10px}
+
+  @media(max-width:840px){
+    .nav-links{display:none}
+    .bgrid{grid-template-columns:1fr 1fr}
+    .split,.smart-grid{grid-template-columns:1fr}
+    .split.right .txt{order:0;text-align:left}
+    .split.right .lead{margin-left:0}
+    .phone:nth-child(1),.phone:nth-child(3){display:none}
+  }
+  @media(max-width:560px){.bgrid{grid-template-columns:1fr}.fan .tcard:nth-child(n+5){display:none}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="wrap nav-inner">
+    <span class="word">SILK</span>
+    <div class="nav-links">
+      <a href="#">templates</a><a href="#pricing">pricing</a><a href="#">affiliates</a><a href="#">contact us</a>
+    </div>
+    <div class="nav-right">
+      <a href="#" class="nav-links" style="display:inline;font-size:14px;font-weight:600;color:var(--muted)">log in</a>
+      <a href="#" class="btn btn-dark" style="padding:9px 20px;font-size:14px">Sign up</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-card">
+      <div class="grid-bg"></div>
+      <div class="hero-objs">
+        <!-- blue spring -->
+        <svg class="obj o-spring" width="120" height="90" viewBox="0 0 120 90">
+          <g fill="none" stroke="#3f7be0" stroke-width="13" stroke-linecap="round">
+            <path d="M18 20 q22 -14 44 0 q22 14 44 0"/>
+            <path d="M14 44 q22 -14 44 0 q22 14 44 0"/>
+            <path d="M18 68 q22 -14 44 0 q22 14 44 0"/>
+          </g>
+        </svg>
+        <!-- orange sphere -->
+        <svg class="obj o-sphere" width="78" height="78" viewBox="0 0 78 78"><circle cx="39" cy="39" r="36" fill="#ff8a3d"/><ellipse cx="28" cy="26" rx="12" ry="8" fill="#fff" opacity=".35"/></svg>
+        <!-- yellow pill -->
+        <svg class="obj o-pill" width="92" height="50" viewBox="0 0 92 50"><rect x="3" y="3" width="86" height="44" rx="22" fill="#ffd23e"/><rect x="14" y="13" width="24" height="10" rx="5" fill="#fff" opacity=".5"/></svg>
+      </div>
+
+      <div class="phones">
+        <div class="phone scr" style="background:linear-gradient(160deg,#ff8a3d,#ff5b7f)"></div>
+        <div class="phone tall scr" style="background:linear-gradient(160deg,#2b2456,#4d7cfe)"></div>
+        <div class="phone scr" style="background:linear-gradient(160deg,#1fb6a6,#7db4ff)"></div>
+      </div>
+
+      <h1 class="hero-title">Create better video, faster.</h1>
+      <a href="#" class="btn btn-dark">Sign up for free</a>
+    </div>
+  </div>
+</header>
+
+<!-- LOGO BAR -->
+<section class="logobar">
+  <div class="logo-track">
+    <span style="color:#1a1a1a">URBAN OUTFITTERS</span><span style="color:#0066cc">Disney</span><span style="color:#3c8c3c">crocs</span><span style="color:#111">GOAT</span><span style="color:#e84d8a">disco</span><span style="color:#111;font-style:italic">italic</span><span style="color:#7a5cff">Seed</span><span style="color:#c0392b">Music</span><span style="color:#2e7d6b">BLUELAND</span>
+    <span style="color:#1a1a1a">URBAN OUTFITTERS</span><span style="color:#0066cc">Disney</span><span style="color:#3c8c3c">crocs</span><span style="color:#111">GOAT</span><span style="color:#e84d8a">disco</span><span style="color:#111;font-style:italic">italic</span><span style="color:#7a5cff">Seed</span><span style="color:#c0392b">Music</span><span style="color:#2e7d6b">BLUELAND</span>
+  </div>
+</section>
+
+<!-- DARK -->
+<section class="dark">
+  <div class="dk-obj dk1"><svg width="80" height="60" viewBox="0 0 80 60"><g fill="#ffd23e"><rect x="6" y="8" width="64" height="13" rx="6"/><rect x="10" y="26" width="64" height="13" rx="6"/><rect x="6" y="44" width="64" height="13" rx="6"/></g></svg></div>
+  <div class="dk-obj dk2"><svg width="90" height="70" viewBox="0 0 90 70"><g fill="none" stroke="#1fb6a6" stroke-width="11" stroke-linecap="round"><path d="M14 16 q20 -12 40 0 q20 12 40 0"/><path d="M10 36 q20 -12 40 0 q20 12 40 0"/><path d="M14 56 q20 -12 40 0 q20 12 40 0"/></g></svg></div>
+  <div class="wrap">
+    <h2>The all-in-one video editor for modern brands</h2>
+    <p class="sub">Powerful, easy to learn, and designed to supercharge your marketing team.</p>
+    <div class="editor">
+      <div class="editor-bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
+      <div class="editor-body">
+        <div class="ed-main">
+          <div class="ed-row">Recovery</div>
+          <div class="ed-row">Long days</div>
+          <div class="ed-row">Hiking</div>
+          <div class="ed-row">Travel</div>
+          <div class="ed-row">Work from home</div>
+          <div class="ed-row">Exercise</div>
+          <div class="ed-row" style="background:#2b2f63">…and more!</div>
+        </div>
+        <div class="ed-side">
+          <div class="lbl">Design</div>
+          <div style="height:30px;border:1px solid #eee;border-radius:6px"></div>
+          <div class="lbl">Color</div>
+          <div class="swatches">
+            <i style="background:#ff5b7f"></i><i style="background:#ff8a3d"></i><i style="background:#ffd23e"></i><i style="background:#1fb6a6"></i><i style="background:#4d7cfe"></i><i style="background:#8b6cf6"></i>
+            <i style="background:#15120e"></i><i style="background:#888"></i><i style="background:#ddd"></i><i style="background:#2e7d6b"></i><i style="background:#e84d8a"></i><i style="background:#7a5cff"></i>
+          </div>
+          <div class="lbl">Styles</div>
+          <div class="swatches"><i style="background:#eee"></i><i style="background:#eee"></i><i style="background:#eee"></i><i style="background:#eee"></i><i style="background:#eee"></i><i style="background:#eee"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- YELLOW -->
+<section class="yellow">
+  <div class="wrap">
+    <h2>Creative strategy made easy</h2>
+    <p>Explore and remix templates from the world's best brands. Testing new concepts has never been easier.</p>
+    <a href="#" class="btn btn-dark">Sign up for free</a>
+  </div>
+  <div class="fan">
+    <div class="tcard" style="background:linear-gradient(160deg,#fff,#ffe);transform:rotate(-9deg)"><div style="height:100%;background:linear-gradient(160deg,#f5d76e,#e67e22)"></div></div>
+    <div class="tcard" style="transform:rotate(-5deg);background:linear-gradient(160deg,#ff9a9e,#fecfef)"></div>
+    <div class="tcard" style="transform:rotate(-2deg);background:linear-gradient(160deg,#4d7cfe,#8b6cf6)"></div>
+    <div class="tcard" style="transform:rotate(0deg);background:#1f8f4e;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:34px">40% OFF</div>
+    <div class="tcard" style="transform:rotate(2deg);background:linear-gradient(160deg,#7db4ff,#cde8ff)"></div>
+    <div class="tcard" style="transform:rotate(5deg);background:linear-gradient(160deg,#1fb6a6,#7be0d3)"></div>
+    <div class="tcard" style="transform:rotate(9deg);background:linear-gradient(160deg,#ff5b7f,#ff8a3d)"></div>
+  </div>
+</section>
+
+<!-- BUILDING BLOCKS -->
+<section class="blocks">
+  <div class="wrap">
+    <h2>Powerful building blocks</h2>
+    <p class="sub">Creative power that goes beyond templates. Create stunning videos using our expansive library of building blocks.</p>
+    <div class="bgrid">
+      <div class="bcard"><div class="thumb"><div style="width:54px;height:54px;border-radius:10px;background:#fff;box-shadow:0 8px 20px rgba(0,0,0,.2);transform:rotate(-8deg)"></div></div><h3>3D Display Case</h3><div class="timeline"><i></i><i></i><i></i><i></i></div></div>
+      <div class="bcard"><div class="thumb"><div style="width:70px;height:46px;border-radius:8px;background:#fff;transform:rotate(6deg)"></div></div><h3>3D Product Showcase</h3><div class="timeline"><i></i><i></i><i></i><i></i></div></div>
+      <div class="bcard"><div class="thumb"><span style="font-family:'Baloo 2';font-size:26px;font-weight:800;color:#ff5b7f;-webkit-text-stroke:1.5px #15120e">SILK</span></div><h3>3D Text</h3><div class="timeline"><i></i><i></i><i></i><i></i></div></div>
+      <div class="bcard"><div class="thumb"><div style="display:flex;gap:6px"><i style="width:14px;height:14px;border-radius:50%;background:#fff;display:block"></i><i style="width:14px;height:14px;border-radius:50%;background:#fff;display:block;margin-top:14px"></i><i style="width:14px;height:14px;border-radius:50%;background:#fff;display:block"></i></div></div><h3>Falling Objects</h3><div class="timeline"><i></i><i></i><i></i><i></i></div></div>
+      <div class="bcard"><div class="thumb" style="flex-direction:column;gap:3px"><span style="font-family:'Baloo 2';font-weight:800;color:#15120e;font-size:18px;line-height:.9">SILK</span><span style="font-family:'Baloo 2';font-weight:800;color:#fff;font-size:18px;line-height:.9">SILK</span><span style="font-family:'Baloo 2';font-weight:800;color:#15120e;font-size:18px;line-height:.9">SILK</span></div><h3>Fluid Text</h3><div class="timeline"><i></i><i></i><i></i><i></i></div></div>
+      <div class="bcard"><div class="thumb"><div style="width:30px;height:60px;border-radius:6px;background:#ff5b7f;transform:rotate(12deg)"></div></div><h3>Product Fan-Out</h3><div class="timeline"><i></i><i></i><i></i><i></i></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- REMIX -->
+<section class="sec">
+  <div class="wrap split">
+    <div class="txt">
+      <h2>Remix variations in minutes</h2>
+      <p class="lead">Silk's modular design system empowers teams to move faster and more efficiently than traditional video editors.</p>
+    </div>
+    <div class="mini-fan">
+      <div class="m" style="transform:rotate(-8deg);background:linear-gradient(160deg,#ffce9e,#e8a06a)"></div>
+      <div class="m" style="transform:rotate(-2deg);background:linear-gradient(160deg,#a0d8c8,#5fb39e)"></div>
+      <div class="m" style="transform:rotate(6deg);background:linear-gradient(160deg,#ffd23e,#ff8a3d)"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SCALE -->
+<section class="sec">
+  <div class="wrap split right">
+    <div class="txt">
+      <h2>Scale while staying on-brand</h2>
+      <p class="lead">Build and save your own library of templates and building blocks so anyone can create beautiful, on-brand videos.</p>
+    </div>
+    <div class="mini-fan">
+      <div class="m" style="transform:rotate(-6deg);background:linear-gradient(160deg,#4d7cfe,#2b2456)"></div>
+      <div class="m" style="transform:rotate(3deg);background:#111;display:flex;align-items:center;justify-content:center;color:#1fb6a6;font-weight:900;font-size:30px">✶</div>
+      <div class="m" style="transform:rotate(9deg);background:linear-gradient(160deg,#ddd,#bbb)"></div>
+    </div>
+  </div>
+</section>
+
+<!-- MOTION -->
+<section class="sec">
+  <div class="wrap split">
+    <div class="txt">
+      <h2>Advanced motion graphics, made easy.</h2>
+      <p class="lead">Elevate your video with motion that feels modern. Silk gives you the power of pro After Effects without the steep learning curve.</p>
+    </div>
+    <div class="mini-fan">
+      <div class="m" style="transform:rotate(-8deg);background:linear-gradient(160deg,#8b6cf6,#4d7cfe)"></div>
+      <div class="m" style="transform:rotate(0deg);background:linear-gradient(160deg,#ff5b7f,#ff8a3d)"></div>
+      <div class="m" style="transform:rotate(8deg);background:linear-gradient(160deg,#1fb6a6,#7db4ff)"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SMART TOOLS -->
+<section class="smart">
+  <div class="wrap">
+    <h2>Smart tools built for speed</h2>
+    <div class="smart-grid">
+      <div>
+        <div class="tool"><h4>Instant background removal</h4><p>Effortlessly remove backgrounds from product and model shots.</p></div>
+        <div class="tool"><h4>AI captioning</h4><p>One-click captioning of all your videos. Choose from our collection of styles or design your own.</p></div>
+        <div class="tool"><h4>Magic resize</h4><p>Create once, launch everywhere. Easily resize your content for any platform.</p></div>
+      </div>
+      <div class="tunnel">
+        <div class="gridt"></div>
+        <div class="face"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER CTA -->
+<section class="footcta">
+  <div class="wrap">
+    <div class="balloon">SILK</div>
+    <div style="margin-top:26px"><a href="#" class="btn btn-dark">Sign up for free</a></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-col" style="max-width:240px"><span class="word">SILK</span><p style="font-size:14px;color:var(--muted);line-height:1.6;margin-top:12px">The all-in-one video editor for modern brands.</p></div>
+      <div class="foot-col"><h4>Product</h4><a href="#">Templates</a><a href="#pricing">Pricing</a><a href="#">Affiliates</a><a href="#">Changelog</a></div>
+      <div class="foot-col"><h4>Company</h4><a href="#">About</a><a href="#">Careers</a><a href="#">Blog</a><a href="#">Contact us</a></div>
+      <div class="foot-col"><h4>Resources</h4><a href="#">Help center</a><a href="#">Community</a><a href="#">Privacy</a><a href="#">Terms</a></div>
+    </div>
+    <div class="foot-bottom"><span>© 2026 Silk. All rights reserved.</span><span>hey@usesilk.com</span></div>
+  </div>
+</footer>
+
+</body>
+</html>
