@@ -75,16 +75,29 @@ export function LayerView({ layer, frame }: { layer: Layer; frame: number }) {
         </div>
       )
 
-    case 'shape':
+    case 'shape': {
+      if (layer.shape === 'triangle' || layer.shape === 'star') {
+        const path =
+          layer.shape === 'triangle'
+            ? 'M50 3 L97 97 L3 97 Z'
+            : 'M50 3 L61 38 L98 38 L68 60 L79 96 L50 73 L21 96 L32 60 L2 38 L39 38 Z'
+        return (
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ ...common, overflow: 'visible' }}>
+            <path d={path} fill={layer.fill} />
+          </svg>
+        )
+      }
       return (
         <div
           style={{
             ...common,
             background: layer.fill,
-            borderRadius: layer.shape === 'ellipse' ? '50%' : layer.radius,
+            borderRadius:
+              layer.shape === 'ellipse' ? '50%' : layer.shape === 'line' ? layer.height / 2 : layer.radius,
           }}
         />
       )
+    }
 
     case 'image':
       return (

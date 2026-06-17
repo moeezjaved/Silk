@@ -5,6 +5,7 @@ import { nanoid } from 'nanoid'
 import { Tool } from './Rail'
 import { useEditor } from '@/lib/store'
 import { TEMPLATES, buildDoc } from '@/lib/templates'
+import { BLOCKS, BLOCK_CATEGORIES, makePrimitive, PrimitiveKind } from '@/lib/blocks'
 import { Layer } from '@/lib/doc'
 
 function Header({ title }: { title: string }) {
@@ -22,7 +23,6 @@ function Soon({ title }: { title: string }) {
 
 export function SidePanel({ tool, categoryFilter }: { tool: Tool; categoryFilter?: string[] }) {
   const loadDoc = useEditor((s) => s.loadDoc)
-  const addLayer = useEditor((s) => s.addLayer)
   const addLayerFrom = useEditor((s) => s.addLayerFrom)
   const doc = useEditor((s) => s.doc)
   const [chips, setChips] = useState<string[]>(categoryFilter ?? [])
@@ -111,19 +111,7 @@ export function SidePanel({ tool, categoryFilter }: { tool: Tool; categoryFilter
 
   // ── Blocks ──
   if (tool === 'blocks') {
-    return (
-      <div>
-        <Header title="Blocks" />
-        <div className="px-4 grid grid-cols-2 gap-3">
-          <button onClick={() => addLayer('shape')} className="aspect-square bg-white/5 hover:bg-white/10 rounded-lg flex items-center justify-center">
-            <span className="w-12 h-12 rounded-md bg-[#ff5b7f]" />
-          </button>
-          <button onClick={() => { addLayer('shape'); }} className="aspect-square bg-white/5 hover:bg-white/10 rounded-lg flex items-center justify-center">
-            <span className="w-12 h-12 rounded-full bg-[#7db4ff]" />
-          </button>
-        </div>
-      </div>
-    )
+    return <BlocksPanel />
   }
 
   // ── Uploads ──
@@ -145,4 +133,82 @@ export function SidePanel({ tool, categoryFilter }: { tool: Tool; categoryFilter
     stock: 'Stock', brandkit: 'BrandKit', captions: 'Captions', audio: 'Audio', shortcuts: 'Shortcuts',
   }
   return <Soon title={titles[tool] || ''} />
+}
+
+// ── Blocks panel (primitives + composite blocks) ──────────────────────────────
+const PRIMS: { kind: PrimitiveKind; icon: string }[] = [
+  { kind: 'rect', icon: '▢' },
+  { kind: 'ellipse', icon: '◯' },
+  { kind: 'star', icon: '★' },
+  { kind: 'line', icon: '╱' },
+  { kind: 'triangle', icon: '△' },
+]
+
+function BlocksPanel() {
+  const doc = useEditor((s) => s.doc)
+  const addLayerFrom = useEditor((s) => s.addLayerFrom)
+  const [q, setQ] = useState('')
+  const [cat, setCat] = useState<string>('All')
+
+  const query = q.trim().toLowerCase()
+  const blocks = BLOCKS.filter(
+    (b) => (cat === 'All' || b.category === cat) && (!query || b.name.toLowerCase().includes(query)),
+  )
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="p-3">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search for something to add"
+          className="w-full bg-white/5 border border-white/10 rounded-full px-4 py-2.5 text-sm text-white/90 outline-none focus:border-[#ff5b7f] placeholder:text-white/30"
+        />
+        {/* primitives row */}
+        <div className="flex gap-2 mt-3">
+          {PRIMS.map((p) => (
+            <button
+              key={p.kind}
+              onClick={() => addLayerFrom(makePrimitive(p.kind, doc))}
+              className="flex-1 aspect-square bg-white/5 hover:bg-white/10 rounded-lg grid place-items-center text-white/80 text-xl"
+              title={p.kind}
+            >
+              {p.icon}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* category filter */}
+      <div className="flex gap-1.5 px-3 pb-2 flex-wrap">
+        {['All', ...BLOCK_CATEGORIES].map((c) => (
+          <button
+            key={c}
+            onClick={() => setCat(c)}
+            className={`text-[11px] rounded-full px-2.5 py-1 ${cat === c ? 'bg-white/15 text-white' : 'text-white/45 hover:text-white/80'}`}
+          >
+            {c}
+          </button>
+        ))}
+      </div>
+
+      {/* block thumbnails */}
+      <div className="flex-1 overflow-y-auto px-3 pb-4 grid grid-cols-2 gap-3">
+        {blocks.map((b) => (
+          <button
+            key={b.id}
+            onClick={() => addLayerFrom(b.build(doc))}
+            className="group relative rounded-xl overflow-hidden border border-white/10 aspect-[3/4] flex flex-col items-center justify-center"
+            style={{ background: `linear-gradient(150deg, ${b.accent}, #15120e)` }}
+          >
+            <span className="text-white/90 text-xs font-bold text-center px-2">{b.name}</span>
+            <span className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-center justify-center opacity-0 group-hover:opacity-100">
+              <span className="bg-white text-black text-xs font-semibold rounded-full px-3 py-1.5">+ Add</span>
+            </span>
+          </button>
+        ))}
+        {blocks.length === 0 && <div className="col-span-2 text-white/30 text-sm py-6 text-center">No blocks match.</div>}
+      </div>
+    </div>
+  )
 }

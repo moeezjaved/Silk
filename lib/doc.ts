@@ -64,7 +64,7 @@ export interface VideoLayer extends BaseLayer {
 
 export interface ShapeLayer extends BaseLayer {
   type: 'shape'
-  shape: 'rect' | 'ellipse'
+  shape: 'rect' | 'ellipse' | 'triangle' | 'star' | 'line'
   fill: string
   radius: number
 }
