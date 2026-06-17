@@ -197,7 +197,7 @@ function BlocksPanel() {
         {blocks.map((b) => (
           <button
             key={b.id}
-            onClick={() => addLayerFrom(b.build(doc))}
+            onClick={() => addLayerFrom(b.build(doc, b.defaultProps))}
             className="group relative rounded-xl overflow-hidden border border-white/10 aspect-[3/4] flex flex-col items-center justify-center"
             style={{ background: `linear-gradient(150deg, ${b.accent}, #15120e)` }}
           >

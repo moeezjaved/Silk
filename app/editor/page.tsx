@@ -11,12 +11,15 @@ import { TopBar } from '@/components/studio/TopBar'
 import { Rail, type Tool } from '@/components/studio/Rail'
 import { SidePanel } from '@/components/studio/SidePanel'
 import { StudioTimeline } from '@/components/studio/StudioTimeline'
+import { BlockInspector } from '@/components/studio/BlockInspector'
+import { GroupLayer } from '@/lib/doc'
 
 function Studio() {
   const params = useSearchParams()
   const loadDoc = useEditor((s) => s.loadDoc)
   const setFrame = useEditor((s) => s.setFrame)
   const selectedId = useEditor((s) => s.selectedId)
+  const selectedLayer = useEditor((s) => s.doc.layers.find((l) => l.id === s.selectedId))
 
   const cat = params.get('cat')
   const categoryFilter = cat ? cat.split(',') : undefined
@@ -43,7 +46,11 @@ function Studio() {
           <SidePanel tool={tool} categoryFilter={categoryFilter} />
         </div>
         <Canvas />
-        {selectedId && <Inspector />}
+        {selectedLayer?.type === 'group' && (selectedLayer as GroupLayer).blockId ? (
+          <BlockInspector group={selectedLayer as GroupLayer} />
+        ) : selectedId ? (
+          <Inspector />
+        ) : null}
       </div>
       <StudioTimeline />
     </div>

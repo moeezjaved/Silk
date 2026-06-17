@@ -2,7 +2,8 @@
 
 import { create } from 'zustand'
 import { nanoid } from 'nanoid'
-import { FORMATS, Layer, LayerType, SceneDoc, emptyDoc } from './doc'
+import { FORMATS, GroupLayer, Layer, LayerType, SceneDoc, emptyDoc } from './doc'
+import { getBlockDef, Props } from './blocks'
 
 interface EditorState {
   doc: SceneDoc
@@ -22,6 +23,7 @@ interface EditorState {
   setDuration: (frames: number) => void
   addLayer: (type: LayerType) => void
   addLayerFrom: (layer: Layer) => void
+  setBlockProps: (id: string, props: Props) => void
   updateLayer: (id: string, patch: Partial<Layer>) => void
   removeLayer: (id: string) => void
   reorder: (id: string, dir: 'up' | 'down') => void
@@ -130,6 +132,20 @@ export const useEditor = create<EditorState>((set, get) => ({
 
   addLayerFrom: (layer) =>
     set((s) => ({ doc: { ...s.doc, layers: [...s.doc.layers, layer] }, selectedId: layer.id })),
+
+  // rebuild a block group's children from new prop values, keeping its box/id
+  setBlockProps: (id, props) =>
+    set((s) => {
+      const layers = s.doc.layers.map((l) => {
+        if (l.id !== id || l.type !== 'group') return l
+        const g = l as GroupLayer
+        const def = getBlockDef(g.blockId)
+        if (!def) return l
+        const rebuilt = def.build(s.doc, props)
+        return { ...g, children: rebuilt.children, baseWidth: rebuilt.baseWidth, baseHeight: rebuilt.baseHeight, props }
+      })
+      return { doc: { ...s.doc, layers } }
+    }),
 
   updateLayer: (id, patch) =>
     set((s) => ({

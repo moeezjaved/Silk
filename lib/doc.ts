@@ -81,6 +81,7 @@ export interface GroupLayer extends BaseLayer {
   baseHeight: number
   children: Layer[]
   blockId?: string // which BlockDef produced it (for re-instancing / Save Block)
+  props?: Record<string, unknown> // editable slot values (images, text, params)
 }
 
 export type Layer = TextLayer | ImageLayer | VideoLayer | ShapeLayer | GroupLayer
