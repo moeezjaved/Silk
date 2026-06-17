@@ -78,30 +78,43 @@ export function StudioTimeline() {
         </div>
       </div>
 
-      {/* tracks */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2">
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-black/40 w-20 shrink-0">⬚ Add blocks</span>
-          <div className="flex items-center gap-1.5 flex-1">
-            <button
-              onClick={() => select(selectedId)}
-              className="h-9 rounded-md bg-[#e6e6ea] border border-black/10 flex items-center px-3 text-xs text-black/60"
-              style={{ width: `${Math.min(100, (totalSecs / Math.max(totalSecs, totalSecs)) * 100)}%`, maxWidth: 220 }}
-            >
-              {totalSecs.toFixed(0)}s scene · {doc.layers.length} layers
-            </button>
-            <button
-              onClick={() => setDuration(doc.durationInFrames + doc.fps)}
-              className="w-9 h-9 rounded-md bg-[#e6e6ea] border border-black/10 grid place-items-center text-black/50 hover:bg-black/10"
-              title="Add a second"
-            >
-              +
-            </button>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-black/40 w-20 shrink-0">♪ Add audio</span>
-          <div className="h-9 flex-1 rounded-md border border-dashed border-black/15" />
+      {/* tracks — one named bar per block/layer, like a real timeline */}
+      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1.5">
+        {[...doc.layers].reverse().map((l) => {
+          const left = (l.startFrame / doc.durationInFrames) * 100
+          const width = Math.max(4, ((l.endFrame - l.startFrame) / doc.durationInFrames) * 100)
+          const on = selectedId === l.id
+          const icon = l.type === 'group' ? '⊞' : l.type === 'text' ? 'T' : l.type === 'image' ? '🖼' : l.type === 'video' ? '🎬' : '◆'
+          return (
+            <div key={l.id} className="relative h-8">
+              <button
+                onClick={() => select(l.id)}
+                style={{ left: `${left}%`, width: `${width}%` }}
+                className={`absolute top-0 h-full rounded-md flex items-center gap-1.5 px-2 text-xs border truncate ${
+                  on ? 'bg-[#cdeccd] border-[#3a9a3a] text-[#1c4d1c]' : 'bg-[#e7f3e7] border-[#bcd9bc] text-[#3a6b3a] hover:bg-[#ddeedd]'
+                }`}
+              >
+                <span>{icon}</span>
+                <span className="truncate">{l.name}</span>
+              </button>
+            </div>
+          )
+        })}
+
+        {doc.layers.length === 0 && (
+          <div className="text-black/30 text-xs py-4 text-center">Add a block or layer — it appears here as a track.</div>
+        )}
+
+        {/* add-time + audio */}
+        <div className="flex items-center gap-2 pt-1">
+          <button
+            onClick={() => setDuration(doc.durationInFrames + doc.fps)}
+            className="w-8 h-8 rounded-md bg-[#e6e6ea] border border-black/10 grid place-items-center text-black/50 hover:bg-black/10"
+            title="Add a second"
+          >
+            +
+          </button>
+          <span className="text-xs text-black/30">♪ Add audio</span>
         </div>
       </div>
     </div>
