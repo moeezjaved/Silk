@@ -6,7 +6,20 @@
 // flagged is_template; "use template" duplicates the document.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type LayerType = 'text' | 'image' | 'video' | 'shape'
+export type LayerType = 'text' | 'image' | 'video' | 'shape' | 'group'
+
+// ── animation ────────────────────────────────────────────────────────────────
+export type Easing = 'linear' | 'easeIn' | 'easeOut' | 'easeInOut' | 'back'
+
+export type EnterPreset =
+  | 'none' | 'fade' | 'slideUp' | 'slideDown' | 'slideLeft' | 'slideRight' | 'pop' | 'scaleIn'
+export type ExitPreset =
+  | 'none' | 'fade' | 'slideUp' | 'slideDown' | 'slideLeft' | 'slideRight' | 'scaleOut'
+
+export interface LayerAnim {
+  enter?: { preset: EnterPreset; duration: number; easing?: Easing }
+  exit?: { preset: ExitPreset; duration: number; easing?: Easing }
+}
 
 /** Properties every layer shares. Position/size are in document pixels. */
 export interface BaseLayer {
@@ -21,6 +34,7 @@ export interface BaseLayer {
   opacity: number // 0..1
   startFrame: number // first frame the layer is visible
   endFrame: number // last frame the layer is visible (inclusive)
+  anim?: LayerAnim // enter/exit motion
 }
 
 export interface TextLayer extends BaseLayer {
@@ -55,7 +69,21 @@ export interface ShapeLayer extends BaseLayer {
   radius: number
 }
 
-export type Layer = TextLayer | ImageLayer | VideoLayer | ShapeLayer
+/**
+ * A group is a reusable, positionable container of child layers — the unit a
+ * "block" is made of. Children are laid out in the group's intrinsic
+ * coordinate space (baseWidth × baseHeight) and scaled to the group's current
+ * width/height, so resizing a block scales its contents.
+ */
+export interface GroupLayer extends BaseLayer {
+  type: 'group'
+  baseWidth: number
+  baseHeight: number
+  children: Layer[]
+  blockId?: string // which BlockDef produced it (for re-instancing / Save Block)
+}
+
+export type Layer = TextLayer | ImageLayer | VideoLayer | ShapeLayer | GroupLayer
 
 export interface SceneDoc {
   id: string

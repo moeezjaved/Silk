@@ -15,6 +15,7 @@ import { StudioTimeline } from '@/components/studio/StudioTimeline'
 function Studio() {
   const params = useSearchParams()
   const loadDoc = useEditor((s) => s.loadDoc)
+  const setFrame = useEditor((s) => s.setFrame)
   const selectedId = useEditor((s) => s.selectedId)
 
   const cat = params.get('cat')
@@ -25,7 +26,9 @@ function Studio() {
 
   useEffect(() => {
     loadDoc(buildDoc(params.get('template') || undefined))
-  }, [loadDoc, params])
+    // open on a settled frame so the composed scene is visible (not mid-entrance)
+    setFrame(60)
+  }, [loadDoc, setFrame, params])
 
   useEffect(() => {
     createClient().auth.getUser().then(({ data }) => setEmail(data.user?.email ?? undefined))

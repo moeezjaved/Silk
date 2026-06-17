@@ -130,7 +130,7 @@ export function Canvas() {
         >
           {visible.map((l) => (
             <div key={l.id} onPointerDown={(e) => startMove(e, l.id)} style={{ cursor: 'move' }}>
-              <LayerView layer={l} />
+              <LayerView layer={l} frame={currentFrame} />
             </div>
           ))}
         </div>

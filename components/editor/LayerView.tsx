@@ -1,24 +1,51 @@
 'use client'
 
-import { Layer } from '@/lib/doc'
+import { Layer, isLayerVisible } from '@/lib/doc'
+import { resolveAnim } from '@/lib/anim'
 
 /**
- * Pure presentation of a single layer at the current frame.
- * No editor logic here — this same component is what the export renderer
- * will draw, so the edited result and the final video stay identical.
+ * Pure presentation of a single layer at a given frame, including its
+ * enter/exit animation. The same component draws the editor, preview, and
+ * (later) the export, so what you see is what you render.
  */
-export function LayerView({ layer }: { layer: Layer }) {
+export function LayerView({ layer, frame }: { layer: Layer; frame: number }) {
+  const m = resolveAnim(layer, frame)
+
   const common: React.CSSProperties = {
     position: 'absolute',
     left: layer.x,
     top: layer.y,
     width: layer.width,
     height: layer.height,
-    transform: `rotate(${layer.rotation}deg)`,
-    opacity: layer.opacity,
+    transform: `translate(${m.dx}px, ${m.dy}px) rotate(${layer.rotation}deg) scale(${m.scale})`,
+    transformOrigin: 'center center',
+    opacity: layer.opacity * m.opacityMul,
   }
 
   switch (layer.type) {
+    case 'group': {
+      const sx = layer.width / layer.baseWidth
+      const sy = layer.height / layer.baseHeight
+      return (
+        <div
+          style={{
+            position: 'absolute',
+            left: layer.x,
+            top: layer.y,
+            width: layer.baseWidth,
+            height: layer.baseHeight,
+            transform: `translate(${m.dx}px, ${m.dy}px) rotate(${layer.rotation}deg) scale(${sx * m.scale}, ${sy * m.scale})`,
+            transformOrigin: 'top left',
+            opacity: layer.opacity * m.opacityMul,
+          }}
+        >
+          {layer.children.map((c) =>
+            isLayerVisible(c, frame) ? <LayerView key={c.id} layer={c} frame={frame} /> : null,
+          )}
+        </div>
+      )
+    }
+
     case 'text':
       return (
         <div

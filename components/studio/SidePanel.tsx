@@ -38,6 +38,7 @@ export function SidePanel({ tool, categoryFilter }: { tool: Tool; categoryFilter
       startFrame: 0, endFrame: doc.durationInFrames,
       text: kind === 'heading' ? 'Add a heading' : kind === 'subheading' ? 'Add a subheading' : 'Add a little bit of body text',
       fontSize: sizes[kind], fontWeight: weights[kind], color: '#ffffff', align: 'center', lineHeight: 1.1, fontFamily: 'Inter, sans-serif',
+      anim: { enter: { preset: 'slideUp', duration: 12 } },
     }
     addLayerFrom(layer)
   }
@@ -51,6 +52,7 @@ export function SidePanel({ tool, categoryFilter }: { tool: Tool; categoryFilter
       id: nanoid(8), name: file.name.slice(0, 18), type: isVideo ? 'video' : 'image',
       x: cx - 300, y: doc.height / 2 - 300, width: 600, height: 600, rotation: 0, opacity: 1,
       startFrame: 0, endFrame: doc.durationInFrames, src: url, fit: 'cover', radius: 0,
+      anim: { enter: { preset: 'fade', duration: 10 } },
     } as Layer)
   }
 

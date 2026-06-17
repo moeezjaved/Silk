@@ -1,7 +1,8 @@
 'use client'
 
-import { Layer } from '@/lib/doc'
+import { Layer, LayerAnim } from '@/lib/doc'
 import { useEditor } from '@/lib/store'
+import { ENTER_PRESETS, EXIT_PRESETS } from '@/lib/anim'
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -97,6 +98,49 @@ export function Inspector() {
             </Row>
           </div>
         )}
+
+        {/* motion */}
+        <div className="space-y-2 border-t border-white/10 pt-3">
+          <div className="text-[11px] uppercase tracking-wider text-white/40">Motion</div>
+          {(() => {
+            const anim = layer.anim ?? {}
+            const setAnim = (patch: Partial<LayerAnim>) => set({ anim: { ...anim, ...patch } as LayerAnim })
+            return (
+              <>
+                <Row label="In">
+                  <select
+                    className={inputCls}
+                    value={anim.enter?.preset ?? 'none'}
+                    onChange={(e) => setAnim({ enter: { preset: e.target.value as never, duration: anim.enter?.duration ?? 12 } })}
+                  >
+                    {ENTER_PRESETS.map((p) => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </Row>
+                {anim.enter && anim.enter.preset !== 'none' && (
+                  <Row label="In dur">
+                    <input className={inputCls} type="number" min={1} value={anim.enter.duration}
+                      onChange={(e) => setAnim({ enter: { preset: anim.enter!.preset, duration: num(e.target.value) } })} />
+                  </Row>
+                )}
+                <Row label="Out">
+                  <select
+                    className={inputCls}
+                    value={anim.exit?.preset ?? 'none'}
+                    onChange={(e) => setAnim({ exit: { preset: e.target.value as never, duration: anim.exit?.duration ?? 12 } })}
+                  >
+                    {EXIT_PRESETS.map((p) => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </Row>
+                {anim.exit && anim.exit.preset !== 'none' && (
+                  <Row label="Out dur">
+                    <input className={inputCls} type="number" min={1} value={anim.exit.duration}
+                      onChange={(e) => setAnim({ exit: { preset: anim.exit!.preset, duration: num(e.target.value) } })} />
+                  </Row>
+                )}
+              </>
+            )
+          })()}
+        </div>
 
         {/* timing */}
         <div className="space-y-2 border-t border-white/10 pt-3">

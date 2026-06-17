@@ -36,6 +36,7 @@ function makeLayer(type: LayerType, doc: SceneDoc): Layer {
     opacity: 1,
     startFrame: 0,
     endFrame: doc.durationInFrames,
+    anim: { enter: { preset: 'fade' as const, duration: 10 } },
   }
   const cx = doc.width / 2
   const cy = doc.height / 2
@@ -92,6 +93,9 @@ function makeLayer(type: LayerType, doc: SceneDoc): Layer {
         fit: 'cover',
         radius: 24,
       }
+    default:
+      // groups are inserted via addLayerFrom (block instancing), not makeLayer
+      throw new Error(`makeLayer: unsupported type ${type}`)
   }
 }
 
