@@ -16,9 +16,19 @@ export type EnterPreset =
 export type ExitPreset =
   | 'none' | 'fade' | 'slideUp' | 'slideDown' | 'slideLeft' | 'slideRight' | 'scaleOut'
 
+/** Absolute start values an entrance animates FROM (→ the layer's rest values). */
+export interface AnimFrom {
+  x?: number
+  y?: number
+  rotation?: number
+  scale?: number
+  opacity?: number
+}
+
 export interface LayerAnim {
   enter?: { preset: EnterPreset; duration: number; easing?: Easing }
   exit?: { preset: ExitPreset; duration: number; easing?: Easing }
+  from?: AnimFrom // custom entrance: interpolate these start values to rest over enter.duration
 }
 
 /** Properties every layer shares. Position/size are in document pixels. */

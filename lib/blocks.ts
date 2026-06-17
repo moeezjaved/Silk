@@ -84,9 +84,13 @@ export const BLOCKS: BlockDef[] = [
         id: id(), name: `Item ${i + 1}`, type: 'image',
         x: W / 2 - iw / 2 + (i - mid) * 60, y: H / 2 - ih / 2,
         width: iw, height: ih, rotation: (i - mid) * spread, opacity: 1,
-        startFrame: i * 4, endFrame: doc.durationInFrames,
+        startFrame: i * 5, endFrame: doc.durationInFrames,
         src, fit: 'contain', radius: 12,
-        anim: { enter: { preset: 'pop', duration: 16 } },
+        // fan OUT: each item starts stacked at center (unrotated) and eases to its place with overshoot
+        anim: {
+          enter: { preset: 'none', duration: 20, easing: 'back' },
+          from: { x: W / 2 - iw / 2, rotation: 0, opacity: 0, scale: 0.6 },
+        },
       }))
       return mkGroup(doc, 'product-fan', 'Product Fan', W, H, applyEffect(children, str(props, 'effect', 'default')), props)
     },

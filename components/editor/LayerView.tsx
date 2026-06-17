@@ -17,7 +17,7 @@ export function LayerView({ layer, frame }: { layer: Layer; frame: number }) {
     top: layer.y,
     width: layer.width,
     height: layer.height,
-    transform: `translate(${m.dx}px, ${m.dy}px) rotate(${layer.rotation}deg) scale(${m.scale})`,
+    transform: `translate(${m.dx}px, ${m.dy}px) rotate(${layer.rotation + m.drot}deg) scale(${m.scale})`,
     transformOrigin: 'center center',
     opacity: layer.opacity * m.opacityMul,
   }
@@ -34,7 +34,7 @@ export function LayerView({ layer, frame }: { layer: Layer; frame: number }) {
             top: layer.y,
             width: layer.baseWidth,
             height: layer.baseHeight,
-            transform: `translate(${m.dx}px, ${m.dy}px) rotate(${layer.rotation}deg) scale(${sx * m.scale}, ${sy * m.scale})`,
+            transform: `translate(${m.dx}px, ${m.dy}px) rotate(${layer.rotation + m.drot}deg) scale(${sx * m.scale}, ${sy * m.scale})`,
             transformOrigin: 'top left',
             opacity: layer.opacity * m.opacityMul,
           }}

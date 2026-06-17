@@ -20,11 +20,13 @@ const SLIDE = 160
 export interface AnimMods {
   dx: number
   dy: number
+  drot: number
   scale: number
   opacityMul: number
 }
 
-const IDENTITY: AnimMods = { dx: 0, dy: 0, scale: 1, opacityMul: 1 }
+const IDENTITY: AnimMods = { dx: 0, dy: 0, drot: 0, scale: 1, opacityMul: 1 }
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 
 /**
  * Enter presets: p=0 → fully off (just appearing), p=1 → resting/identity.
@@ -61,29 +63,43 @@ function exitMods(preset: ExitPreset, p: number, easing: Easing): AnimMods {
   }
 }
 
-/** Combine enter + exit modifiers for a layer at the given global frame. */
+const merge = (a: AnimMods, b: AnimMods): AnimMods => ({
+  dx: a.dx + b.dx, dy: a.dy + b.dy, drot: a.drot + b.drot,
+  scale: a.scale * b.scale, opacityMul: a.opacityMul * b.opacityMul,
+})
+
+/** Combine enter/from + exit modifiers for a layer at the given global frame. */
 export function resolveAnim(layer: Layer, frame: number): AnimMods {
   const a = layer.anim
   if (!a) return IDENTITY
   let mods = { ...IDENTITY }
+  const enterDur = Math.max(1, a.enter?.duration ?? 15)
+
+  // custom entrance: interpolate explicit start values → the layer's rest values
+  if (a.from) {
+    const p = clamp01((frame - layer.startFrame) / enterDur)
+    if (p < 1) {
+      const e = EASE[a.enter?.easing ?? 'easeOut'](p)
+      const f = a.from
+      const m: AnimMods = { ...IDENTITY }
+      if (f.x != null) m.dx = (f.x - layer.x) * (1 - e)
+      if (f.y != null) m.dy = (f.y - layer.y) * (1 - e)
+      if (f.rotation != null) m.drot = (f.rotation - layer.rotation) * (1 - e)
+      if (f.scale != null) m.scale = lerp(f.scale, 1, e)
+      if (f.opacity != null) m.opacityMul = lerp(f.opacity, 1, e)
+      mods = merge(mods, m)
+    }
+  }
 
   if (a.enter && a.enter.preset !== 'none') {
-    const dur = Math.max(1, a.enter.duration)
-    const p = clamp01((frame - layer.startFrame) / dur)
-    if (p < 1) {
-      const m = enterMods(a.enter.preset, p, a.enter.easing ?? 'easeOut')
-      mods = { dx: mods.dx + m.dx, dy: mods.dy + m.dy, scale: mods.scale * m.scale, opacityMul: mods.opacityMul * m.opacityMul }
-    }
+    const p = clamp01((frame - layer.startFrame) / enterDur)
+    if (p < 1) mods = merge(mods, enterMods(a.enter.preset, p, a.enter.easing ?? 'easeOut'))
   }
 
   if (a.exit && a.exit.preset !== 'none') {
     const dur = Math.max(1, a.exit.duration)
-    const start = layer.endFrame - dur
-    const p = clamp01((frame - start) / dur)
-    if (p > 0) {
-      const m = exitMods(a.exit.preset, p, a.exit.easing ?? 'easeIn')
-      mods = { dx: mods.dx + m.dx, dy: mods.dy + m.dy, scale: mods.scale * m.scale, opacityMul: mods.opacityMul * m.opacityMul }
-    }
+    const p = clamp01((frame - (layer.endFrame - dur)) / dur)
+    if (p > 0) mods = merge(mods, exitMods(a.exit.preset, p, a.exit.easing ?? 'easeIn'))
   }
 
   return mods
